@@ -1,4 +1,9 @@
-import { Tldraw, useEditor, createShapeId } from "@tldraw/tldraw";
+import {
+  Tldraw,
+  useEditor,
+  createShapeId,
+  getSvgAsImage,
+} from "@tldraw/tldraw";
 import "@tldraw/tldraw/tldraw.css";
 import { useState } from "react";
 
@@ -39,6 +44,32 @@ export default function App() {
           <SaveButton onSave={setSnapshotData} />
         </Tldraw>
       </div>
+
+      {/* Second Column */}
+      <div style={{ width: 500, height: 500, marginLeft: 20 }}>
+        <textarea
+          style={{ width: "100%", height: "100%" }}
+          value={snapshotData}
+          readOnly
+        />
+      </div>
+
+      {/* Third Column with Black Border and Download Button */}
+      <div
+        style={{
+          width: 500,
+          height: 500,
+          marginLeft: 20,
+          border: "2px solid black",
+        }}
+      >
+        <DownloadButton data={snapshotData} />
+        <div style={{ width: "100%", height: "100%", overflow: "auto" }}>
+          {snapshotData && (
+            <div dangerouslySetInnerHTML={{ __html: snapshotData }} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -56,9 +87,19 @@ function SaveButton({ onSave }) {
         backgroundColor: "lightblue",
       }}
       onClick={async () => {
-        const snapshot = await editor.getSvg(editor.selectedShapeIds);
-        const stringified = snapshot;
+        const svg = await editor.getSvg(editor.selectedShapeIds);
+        const stringified = svg.outerHTML;
         // console.log("Export SVG!");
+        const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(
+          navigator.userAgent
+        );
+
+        const blob = await getSvgAsImage(svg, IS_SAFARI, {
+          type: "png",
+          quality: 1,
+          scale: 1,
+        });
+        console.log(blob);
         console.log(stringified);
 
         onSave(stringified);
@@ -66,5 +107,34 @@ function SaveButton({ onSave }) {
     >
       Export SVG
     </button>
+  );
+}
+
+function DownloadButton({ data }) {
+  const fileName = "exported.svg";
+
+  // Create a Blob from the SVG data
+  const svgBlob = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+
+  // Generate a URL for the Blob
+  const url = URL.createObjectURL(svgBlob);
+
+  return (
+    <a
+      href={url}
+      download={fileName}
+      style={{
+        position: "absolute",
+        zIndex: 1000,
+        right: 10,
+        top: 10,
+        backgroundColor: "lightblue",
+        padding: "5px 10px",
+        textDecoration: "none",
+        color: "black",
+      }}
+    >
+      Download SVG
+    </a>
   );
 }
