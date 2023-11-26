@@ -7,15 +7,13 @@ import {
 import "@tldraw/tldraw/tldraw.css";
 import { useState } from "react";
 
-
 function blobToBase64(blob) {
   return new Promise((resolve, _) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
-    reader.readAsDataURL(blob)
-  })
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
 }
-
 
 export default function App() {
   const [snapshotData, setSnapshotData] = useState("");
@@ -75,9 +73,7 @@ export default function App() {
       >
         <DownloadButton data={snapshotData} />
         <div style={{ width: "100%", height: "100%", overflow: "auto" }}>
-          {snapshotData && (
-            <div dangerouslySetInnerHTML={{ __html: snapshotData }} />
-          )}
+          <img src={snapshotData} alt="Base64" />
         </div>
       </div>
     </div>
@@ -94,7 +90,7 @@ function SaveButton({ onSave }) {
         zIndex: 1000,
         right: 10,
         top: 10,
-        backgroundColor: "lightblue",
+        backgroundColor: "lightyellow",
       }}
       onClick={async () => {
         const svg = await editor.getSvg(editor.selectedShapeIds);
@@ -110,27 +106,27 @@ function SaveButton({ onSave }) {
           scale: 1,
         });
 
-        const dataUrl = await blobToBase64(blob)
+        const base64img = await blobToBase64(blob);
 
-        console.log(dataUrl);
+        console.log(base64img);
         console.log(stringified);
 
-        onSave(stringified);
+        onSave(base64img);
       }}
     >
-      Export SVG
+      Export PNG
     </button>
   );
 }
-
 function DownloadButton({ data }) {
-  const fileName = "exported.svg";
+  const fileName = "exported.png";
 
-  // Create a Blob from the SVG data
-  const svgBlob = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+  // Create a Blob from the PNG data
+  // Assuming `data` is a base64 encoded PNG image
+  const pngBlob = new Blob([data], { type: "image/png" });
 
   // Generate a URL for the Blob
-  const url = URL.createObjectURL(svgBlob);
+  const url = URL.createObjectURL(pngBlob);
 
   return (
     <a
@@ -141,13 +137,13 @@ function DownloadButton({ data }) {
         zIndex: 1000,
         right: 10,
         top: 10,
-        backgroundColor: "lightblue",
+        backgroundColor: "lightyellow",
         padding: "5px 10px",
         textDecoration: "none",
         color: "black",
       }}
     >
-      Download SVG
+      Download PNG
     </a>
   );
 }
