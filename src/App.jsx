@@ -118,32 +118,24 @@ function SaveButton({ onSave }) {
     </button>
   );
 }
+
 function DownloadButton({ data }) {
-  const fileName = "exported.png";
-
-  // Create a Blob from the PNG data
-  // Assuming `data` is a base64 encoded PNG image
-  const pngBlob = new Blob([data], { type: "image/png" });
-
-  // Generate a URL for the Blob
-  const url = URL.createObjectURL(pngBlob);
+  const downloadImage = () => {
+    // Create a temporary download link and trigger the download
+    const link = document.createElement("a");
+    link.href = data; // Base64 string as the href
+    link.download = "image.png"; // Setting the file name for the download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
-    <a
-      href={url}
-      download={fileName}
-      style={{
-        position: "absolute",
-        zIndex: 1000,
-        right: 10,
-        top: 10,
-        backgroundColor: "lightyellow",
-        padding: "5px 10px",
-        textDecoration: "none",
-        color: "black",
-      }}
+    <button
+      onClick={downloadImage}
+      style={{ margin: "10px", backgroundColor: "lightyellow" }}
     >
-      Download PNG
-    </a>
+      Download Image
+    </button>
   );
 }
