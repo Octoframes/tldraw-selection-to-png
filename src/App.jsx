@@ -7,6 +7,16 @@ import {
 import "@tldraw/tldraw/tldraw.css";
 import { useState } from "react";
 
+
+function blobToBase64(blob) {
+  return new Promise((resolve, _) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.readAsDataURL(blob)
+  })
+}
+
+
 export default function App() {
   const [snapshotData, setSnapshotData] = useState("");
   const handleMount = (editor) => {
@@ -99,7 +109,10 @@ function SaveButton({ onSave }) {
           quality: 1,
           scale: 1,
         });
-        console.log(blob);
+
+        const dataUrl = await blobToBase64(blob)
+
+        console.log(dataUrl);
         console.log(stringified);
 
         onSave(stringified);
