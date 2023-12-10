@@ -93,7 +93,11 @@ function SaveButton({ onSave }) {
         backgroundColor: "lightyellow",
       }}
       onClick={async () => {
-        const svg = await editor.getSvg(editor.selectedShapeIds);
+
+        // const shapes = editor.selectedShapeIds
+        const shapes = editor.store.allRecords().filter(r => r.typeName === 'shape')
+
+        const svg = await editor.getSvg(shapes);
         const stringified = svg.outerHTML;
         // console.log("Export SVG!");
         const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(
